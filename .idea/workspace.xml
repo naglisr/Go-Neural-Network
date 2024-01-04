@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c13654df-fe27-4d39-bf6b-268fa233d529" name="Changes" comment="init">
-      <change afterPath="$PROJECT_DIR$/testLoadData.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/goNN.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/goNN.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/goAI.py" beforeDir="false" afterPath="$PROJECT_DIR$/goAI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/goban/go.py" beforeDir="false" afterPath="$PROJECT_DIR$/goban/go.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/goban/goban.py" beforeDir="false" afterPath="$PROJECT_DIR$/goban/goban.py" afterDir="false" />
     </list>
@@ -26,6 +23,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -36,16 +34,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.goAI.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.goban.executor&quot;: &quot;Run&quot;,
-    &quot;Python.testLoadData.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PythonContentEntriesConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.goAI.executor": "Debug",
+    "Python.goban.executor": "Debug",
+    "Python.testLoadData.executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PythonContentEntriesConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Python.goban">
     <configuration name="goAI" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="goNN" />
@@ -137,9 +135,9 @@
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/goAI.py</url>
-          <line>154</line>
-          <option name="timeStamp" value="2" />
+          <url>file://$PROJECT_DIR$/.venv/lib/python3.8/site-packages/keras/src/engine/training.py</url>
+          <line>1084</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
