@@ -28,11 +28,11 @@ def process_game_file(path):
 
 # Get data in flat form
 def get_x_and_y_data_from_file(path):
-    print("processing file at path: " + path)
+    # print("processing file at path: " + path)
     game_moves = process_game_file(path)
     turn = 0
     if len(game_moves) == 0:
-        print("no moves found in file")
+        # print("no moves found in file")
         return [], []
 
     def move_index(x, y):
@@ -59,29 +59,35 @@ def get_x_and_y_data_from_file(path):
                 new_state[flat_index] = -1
         turn = 1 - turn
         new_state[361] = turn
-        states.append(new_state)
-        moves.append(move_index(move[0], move[1]))
+        index = move_index(move[0], move[1])
+        if index in range(0, 362):
+            states.append(new_state)
+            moves.append(index)
     return states, moves
 
 
 class Stuff:
+
+    # training: True if generating training dataset, false if generating test dataset
+    def __init__(self, model, path, training=True):
+        self.model = model
+        self.path = path
+        self.training = training
+
+
     fileName = 0
-    write_to_file = False # If false, return numpy array in memory instead
+    write_to_file = False # If false, recursive_get_training_data will be a generator instead
     train_examples = []
     train_labels = []
     test_examples = []
     test_labels = []
-    def write_data_to_dataset(self, states, moves):
-        num = random.random()
-        if num > 0.2:
-            self.train_examples = self.train_examples + states
-            self.train_labels = self.train_labels + moves
-        else:
-            self.test_examples = self.test_examples + states
-            self.test_labels = self.test_labels + moves
+
+    def write_data_to_numpy(self, states, moves):
+        for i, state in enumerate(states):
+            yield state, moves[i]
 
     def write_data_to_file(self, states, moves):
-        print("states in file: " + str(len(states)))
+        # print("states in file: " + str(len(states)))
         for i, state in enumerate(states):
             with open("/home/naglis/trainingData/data/" + str(self.fileName) + ".npy", "w") as f:
                 f.write(str(state))
@@ -95,35 +101,26 @@ class Stuff:
     def recursive_get_training_data(self, path):
         if os.path.isfile(path):
             states, moves = get_x_and_y_data_from_file(path)
-            if self.write_to_file:
-                self.write_data_to_file(states, moves)
-            else:
-                self.write_data_to_dataset(states, moves)
+            yield from self.write_data_to_numpy(states, moves)
         if os.path.isdir(path):
             # x_data, y_data = [], []
             with os.scandir(path) as entries:
                 for entry in entries:
-                    self.recursive_get_training_data(str(entry.path))
+                    yield from self.recursive_get_training_data(path=str(entry.path))
                     # x_data = x_data + data[0]
                     # y_data = y_data + data[1]
             # return x_data, y_data
         # return [], []
 
+    def get_all_training_data(self):
+        return self.recursive_get_training_data(self.path)
 
 def model():
     model = keras.Sequential([
-        # layers.Input((362,), name="input"),
+        # layers.Input(shape=(362,)),
         layers.Dense(362, activation="relu", name="input"),
         layers.Dense(350, activation="relu", name="foo"),
         layers.Dense(300, activation="relu"),
-        layers.Dense(250, activation="relu"),
-        layers.Dense(250, activation="relu"),
-        layers.Dense(250, activation="relu"),
-        layers.Dense(250, activation="relu"),
-        layers.Dense(250, activation="relu"),
-        layers.Dense(250, activation="relu"),
-        layers.Dense(250, activation="relu"),
-        layers.Dense(250, activation="relu"),
         layers.Dense(300, activation="relu"),
         layers.Dense(350, activation="relu"),
         layers.Dense(362, name="lastlayer")
@@ -132,7 +129,7 @@ def model():
     # print(y[0][0:10])
     # print("number of weights:" + str(len(model.weights)))
     model.compile(
-        optimizer=keras.optimizers.RMSprop(learning_rate=1e-4),
+        optimizer=keras.optimizers.RMSprop(learning_rate=1e-5),
         loss=keras.losses.SparseCategoricalCrossentropy(),
         metrics=[keras.metrics.SparseCategoricalAccuracy()],
     )
@@ -140,27 +137,27 @@ def model():
 
 
 def train_model(datapath="goGames/games"):
-    s = Stuff()
-    # x_data, y_data = recursive_get_training_data("goGames/games")
-    s.recursive_get_training_data(datapath)
-    ds = tf.data.TFRecordDataset
-
-    x_train, y_train = np.array(s.train_examples), np.array(s.train_labels)
-    x_test, y_test = np.array(s.test_examples), np.array(s.test_labels)
-
-    data_size = len(x_train)
     compiled_model = model()
-    print(np.shape(x_train))
-    print(np.shape(y_train))
-    compiled_model.fit(
-        x_train,
-        y_train,
-        batch_size=128,
-        epochs=2,
-        validation_data=(x_train[-int(0.1*data_size):], y_train[-int(0.1*data_size):]))
-    result = compiled_model.evaluate(x_test, y_test)
+    s = Stuff(model=compiled_model, path=datapath)
+    ds_counter = tf.data.Dataset.from_generator(
+        s.get_all_training_data,
+        output_signature=(
+            tf.TensorSpec(shape=(362,), dtype=tf.int32),
+            tf.TensorSpec(shape=(), dtype=tf.int32))
+    )
 
-    print(dict(zip(compiled_model.metrics_names, result)))
+
+    # for count_batch in ds_counter.repeat().batch(10).take(10):
+    #     print(count_batch[0].numpy())
+    #     print(np.shape(count_batch[0].numpy()))
+    #     print(count_batch[1].numpy())
+
+    s.model.fit(
+        ds_counter.repeat(1000).batch(256),
+        batch_size=512,
+        epochs=1000,
+        steps_per_epoch=60000
+    )
 
     return compiled_model
 
