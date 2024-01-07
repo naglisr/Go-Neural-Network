@@ -8,6 +8,7 @@ from keras import layers
 import random
 import os
 import numpy as np
+import pickle
 
 
 # Returns move x and y coordinates
@@ -159,8 +160,16 @@ def train_model(datapath="goGames/games"):
         steps_per_epoch=60000
     )
 
+    with open('model.pickle', 'wb') as handle:
+        pickle.dump(compiled_model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
     return compiled_model
 
+def load_model():
+
+    with open('model.pickle', 'rb') as handle:
+        m = pickle.load(handle)
+    return m
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
